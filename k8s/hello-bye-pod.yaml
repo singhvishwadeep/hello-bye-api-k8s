@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+
+metadata:
+  name: hello-bye-pod
+  namespace: hello-bye
+  labels:
+    app: hello-bye
+
+spec:
+  containers:
+
+    - name: hello-api
+      image: vsdpsingh/hello-api:1.0
+      imagePullPolicy: Always
+      ports:
+        - containerPort: 5000
+
+    - name: bye-api
+      image: vsdpsingh/bye-api:1.0
+      imagePullPolicy: Always
+      ports:
+        - containerPort: 6000

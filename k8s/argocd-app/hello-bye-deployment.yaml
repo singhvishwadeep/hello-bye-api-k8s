@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: hello-bye
+
+spec:
+  replicas: 4
+
+  selector:
+    matchLabels:
+      app: hello-bye
+
+  template:
+    metadata:
+      labels:
+        app: hello-bye
+
+    spec:
+      containers:
+
+        - name: hello-api
+          image: vsdpsingh/hello-api:2.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+
+        - name: bye-api
+          image: vsdpsingh/bye-api:2.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 6000
