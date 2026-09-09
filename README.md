@@ -5,6 +5,22 @@ hello bye api for k8s
 
 # Execute (change VERSION as per release)
 ./create-container-push-images.sh
+./test-api.sh
+./remove-all.sh
 
 # Repositories
 https://hub.docker.com/repositories/vsdpsingh
+
+
+# FOR K8S
+
+# Clean ALL
+./delete-all.sh
+
+# Fresh installation
+./fresh-install.sh
+
+# install loki, alloy and grafana for localhost:3000
+./install-logging.sh
+
+
