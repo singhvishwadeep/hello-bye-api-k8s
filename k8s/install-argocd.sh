@@ -82,5 +82,3 @@ argocd-repo-server-7f58d7cdf7-s9bm2                 1/1     Running   0         
 argocd-server-6ccd556fc9-89x7p                      1/1     Running   0          9m27s
 vishwadeep@Ubuntu2604:~/Desktop/banking-services/single-pod-k8s-setup/k8s$ 
 
-Github PAT for my account
-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
