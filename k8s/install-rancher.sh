@@ -36,6 +36,7 @@ RANCHER_IP=`docker inspect rancher --format '{{range .NetworkSettings.Networks}}
 
 
 #10. add this IP in /etc/hosts
+sudo sed -i '/rancher\.local/d' /etc/hosts
 echo "$RANCHER_IP rancher.local" | sudo tee -a /etc/hosts
 curl -k https://rancher.local/ping
 
@@ -70,7 +71,7 @@ echo "wait for sometime"
 echo "open: rancher.local"
 echo "verify IP using docker inspect rancher --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'"
 echo "get password using: docker logs rancher 2>&1 | grep -i \"bootstrap password\""
-echo "new password: VpVTKMtzwP9hNfUy"
+echo "new password: mvaK5xS1oqjZha0u"
 
 
 echo "14. import Existsing Cluster -> generic -> minikube -> Create
@@ -81,5 +82,5 @@ curl --insecure -sfL https://rancher.local/v3/import/95b9bq5wkdbxmvcglsldqj7s8k8
 If you get permission errors creating some of the resources, your user may not have the cluster-admin role. Use this command to apply it:
 kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user <your username from your kubeconfig>
 "
-
+echo "keep on checking logs here: docker logs rancher"
 echo "wait for sometime for minikube to be Active"
