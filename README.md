@@ -23,4 +23,8 @@ https://hub.docker.com/repositories/vsdpsingh
 # install loki, alloy and grafana for localhost:3000
 ./install-logging.sh
 
+# install rancher
+./install-rancher.sh
 
+# install argocd
+./install-argocd.sh

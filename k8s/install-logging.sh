@@ -60,4 +60,20 @@ echo "Add Data Source Loki and add URL: http://loki.loki.svc.cluster.local:3100"
 
 # port forward loki
 kubectl port-forward -n loki svc/loki 3100:3100 &
+
+
+
+kubectl get pods -n grafana
+kubectl get pods -n loki
+kubectl get pods -n alloy
+
+
+echo "kubectl get pods -n grafana
+kubectl get pods -n loki
+kubectl get pods -n alloy"
+
 echo "make sure 3100 and 3000 port are forwarded and open localhost:3000"
+echo "by running below commands - "
+echo "kubectl port-forward -n loki svc/loki 3100:3100 &"
+
+echo "Then check: curl -s "http://localhost:3100/loki/api/v1/labels"
