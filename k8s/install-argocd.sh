@@ -45,10 +45,10 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 
 vishwadeep@Ubuntu2604:~/Desktop/banking-services/single-pod-k8s-setup/k8s$ kubectl -n argocd get secret argocd-initial-admin-secret \
   -o jsonpath="{.data.password}" | base64 -d
-Xw6wvAJQpMtU3uYQ
 
-username: admin
-password: Xw6wvAJQpMtU3uYQ
+
+
+
 
 # Install the Argo CD CLI
 VERSION=$(curl -L -s https://raw.githubusercontent.com/argoproj/argo-cd/stable/VERSION)
@@ -65,7 +65,7 @@ argocd: v3.5.2+e258ee2
   Platform: linux/amd64
 vishwadeep@Ubuntu2604:~/Desktop/banking-services/single-pod-k8s-setup/k8s$ argocd login localhost:8080 \
   --username admin \
-  --password Xw6wvAJQpMtU3uYQ \
+  --password <PASSWORD> \
   --insecure
 
 Logged in Successfuly
