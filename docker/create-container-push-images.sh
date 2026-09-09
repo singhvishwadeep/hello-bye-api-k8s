@@ -1,4 +1,7 @@
 VERSION="1.0"
+
+docker network create hello-network
+
 cd hello-api
 echo "Stopping hello-api..."
 docker stop hello-api 2>/dev/null || true
