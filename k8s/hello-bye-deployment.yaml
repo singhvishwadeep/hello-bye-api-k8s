@@ -20,13 +20,13 @@ spec:
       containers:
 
         - name: hello-api
-          image: vsdpsingh/hello-api:2.0
+          image: vsdpsingh/hello-api:3.0
           imagePullPolicy: Always
           ports:
             - containerPort: 5000
 
         - name: bye-api
-          image: vsdpsingh/bye-api:2.0
+          image: vsdpsingh/bye-api:3.0
           imagePullPolicy: Always
           ports:
             - containerPort: 6000
