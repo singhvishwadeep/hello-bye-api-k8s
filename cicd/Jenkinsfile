@@ -1,0 +1,20 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Verify Project') {
+            steps {
+                sh 'pwd'
+                sh 'ls -la'
+                sh 'ls -la docker/hello-api'
+                sh 'ls -la docker/bye-api'
+            }
+        }
+    }
+}
