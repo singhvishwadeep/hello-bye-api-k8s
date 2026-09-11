@@ -1,7 +1,9 @@
+```groovy
 pipeline {
     agent any
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -16,5 +18,38 @@ pipeline {
                 sh 'ls -la docker/bye-api'
             }
         }
+
+        stage('Build Docker Images') {
+            steps {
+                sh 'docker build -t vsdpsingh/hello-api:jenkins-${BUILD_NUMBER} docker/hello-api'
+                sh 'docker build -t vsdpsingh/bye-api:jenkins-${BUILD_NUMBER} docker/bye-api'
+            }
+        }
+
+        stage('Docker Hub Login') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-creds',
+                        usernameVariable: 'DOCKERHUB_USERNAME',
+                        passwordVariable: 'DOCKERHUB_TOKEN'
+                    )
+                ]) {
+                    sh '''
+                        echo "$DOCKERHUB_TOKEN" | docker login \
+                            --username "$DOCKERHUB_USERNAME" \
+                            --password-stdin
+                    '''
+                }
+            }
+        }
+
+        stage('Push Docker Images') {
+            steps {
+                sh 'docker push vsdpsingh/hello-api:jenkins-${BUILD_NUMBER}'
+                sh 'docker push vsdpsingh/bye-api:jenkins-${BUILD_NUMBER}'
+            }
+        }
     }
 }
+```
