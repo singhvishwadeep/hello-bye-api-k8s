@@ -9,4 +9,6 @@ sudo systemctl status jenkins --no-pager
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 echo "open localhost:8080/"
 echo "register new user -> admin/password"
-
+echo "sudo systemctl status jenkins"
+echo "sudo systemctl stop jenkins"
+echo "sudo systemctl start jenkins"
