@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_TAG = "jenkins-${BUILD_NUMBER}"
+    }
+
     stages {
 
         stage('Checkout') {
@@ -20,8 +24,8 @@ pipeline {
 
         stage('Build Docker Images') {
             steps {
-                sh 'docker build -t vsdpsingh/hello-api:jenkins-${BUILD_NUMBER} docker/hello-api'
-                sh 'docker build -t vsdpsingh/bye-api:jenkins-${BUILD_NUMBER} docker/bye-api'
+                sh 'docker build -t vsdpsingh/hello-api:${IMAGE_TAG} docker/hello-api'
+                sh 'docker build -t vsdpsingh/bye-api:${IMAGE_TAG} docker/bye-api'
             }
         }
 
@@ -30,8 +34,8 @@ pipeline {
                 withCredentials([
                     usernamePassword(
                         credentialsId: 'dockerhub-creds',
-                        usernameVariable: 'vsdpsingh',
-                        passwordVariable: 'Sharing@123'
+                        usernameVariable: 'DOCKERHUB_USERNAME',
+                        passwordVariable: 'DOCKERHUB_TOKEN'
                     )
                 ]) {
                     sh '''
@@ -45,9 +49,10 @@ pipeline {
 
         stage('Push Docker Images') {
             steps {
-                sh 'docker push vsdpsingh/hello-api:jenkins-${BUILD_NUMBER}'
-                sh 'docker push vsdpsingh/bye-api:jenkins-${BUILD_NUMBER}'
+                sh 'docker push vsdpsingh/hello-api:${IMAGE_TAG}'
+                sh 'docker push vsdpsingh/bye-api:${IMAGE_TAG}'
             }
         }
     }
+
 }
