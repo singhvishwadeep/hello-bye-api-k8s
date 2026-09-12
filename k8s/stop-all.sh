@@ -1,3 +1,4 @@
+pkill -f "kubectl port-forward" 2>/dev/null || true
 # 1. Stop Argo CD
 kubectl scale deployment --all --replicas=0 -n argocd
 kubectl scale statefulset --all --replicas=0 -n argocd
@@ -20,3 +21,4 @@ kubectl scale deployment hello-bye --replicas=0 -n default
 
 # 7. Finally stop Minikube
 minikube stop
+
