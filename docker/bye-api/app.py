@@ -4,7 +4,7 @@ import logging
 import json
 from datetime import datetime, timezone
 
-VERSION = "2.0"
+VERSION = "3.0"
 
 app = Flask(__name__)
 
