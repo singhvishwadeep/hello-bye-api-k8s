@@ -14,7 +14,7 @@ alloy:
 
         rule {
           source_labels = ["__meta_kubernetes_namespace"]
-          regex = "default"
+          regex = ".*-hello-bye"
           action = "keep"
         }
 
