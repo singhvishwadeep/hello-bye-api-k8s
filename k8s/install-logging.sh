@@ -77,3 +77,8 @@ echo "by running below commands - "
 echo "kubectl port-forward -n loki svc/loki 3100:3100 &"
 
 echo "Then check: curl -s http://localhost:3100/loki/api/v1/labels"
+
+
+#vishwadeep@Ubuntu2604:~/Desktop/hello-bye-api-k8s/k8s$ export POD_NAME=$(kubectl get pods --namespace grafana -l "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=grafana" -o jsonpath="{.items[0].metadata.name}")
+#     kubectl --namespace grafana port-forward $POD_NAME 3000 &
+#vishwadeep@Ubuntu2604:~/Desktop/hello-bye-api-k8s/k8s$ kubectl port-forward -n loki svc/loki 3100:3100 &
