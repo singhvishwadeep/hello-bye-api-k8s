@@ -19,6 +19,12 @@
 #
 # Ingress Host:
 #   india.local
+#
+# Current Browser URL:
+#   http://india.local:<INGRESS_PORT>/hello
+#
+# Future Clean URL:
+#   http://india.local/hello
 # ============================================================
 
 set -e
@@ -61,7 +67,6 @@ echo
 echo "============================================================"
 echo
 
-
 # ------------------------------------------------------------
 # 2. Start Minikube
 # ------------------------------------------------------------
@@ -71,7 +76,6 @@ echo "Starting Minikube..."
 minikube start --driver=docker
 
 echo
-
 
 # ------------------------------------------------------------
 # 3. Create namespace
@@ -84,15 +88,8 @@ echo "Namespace $NAMESPACE already exists."
 
 echo
 
-
 # ------------------------------------------------------------
 # 4. Create Kubernetes context
-#
-# Context:
-#   india
-#
-# Namespace:
-#   india-hello-bye
 # ------------------------------------------------------------
 
 echo "Configuring Kubernetes context: $CONTEXT"
@@ -105,19 +102,16 @@ kubectl config set-context "$CONTEXT" \
 kubectl config use-context "$CONTEXT"
 
 echo
-
 echo "Current context:"
 kubectl config current-context
 
 echo
-
 echo "Current namespace:"
 kubectl config view --minify \
     -o jsonpath='{..namespace}'
 
 echo
 echo
-
 
 # ------------------------------------------------------------
 # 5. Apply application deployment
@@ -133,7 +127,6 @@ echo "Applying hello-bye deployment..."
 kubectl apply -f hello-bye-deployment.yaml
 
 echo
-
 
 # ------------------------------------------------------------
 # 6. Apply Services
@@ -151,7 +144,6 @@ kubectl apply -f bye-service.yaml
 
 echo
 
-
 # ------------------------------------------------------------
 # 7. Show application resources
 # ------------------------------------------------------------
@@ -161,27 +153,22 @@ echo "             APPLICATION RESOURCES"
 echo "============================================================"
 
 echo
-
 echo "Deployments:"
 kubectl get deployments
 
 echo
-
 echo "ReplicaSets:"
 kubectl get replicasets
 
 echo
-
 echo "Pods:"
 kubectl get pods
 
 echo
-
 echo "Services:"
 kubectl get svc
 
 echo
-
 
 # ------------------------------------------------------------
 # 8. Wait for application rollout
@@ -199,13 +186,11 @@ kubectl rollout status deployment/hello-bye \
 
 echo
 echo "Application deployment is ready."
-
 echo
 
 kubectl get deployment,replicaset,pod
 
 echo
-
 
 # ------------------------------------------------------------
 # 9. Enable NGINX Ingress
@@ -221,7 +206,6 @@ minikube addons enable ingress
 
 echo
 
-
 # ------------------------------------------------------------
 # 10. Wait for Ingress Controller
 # ------------------------------------------------------------
@@ -233,11 +217,8 @@ kubectl rollout status deployment/ingress-nginx-controller \
     --timeout=120s
 
 echo
-
 echo "NGINX Ingress Controller is ready."
-
 echo
-
 
 # ------------------------------------------------------------
 # 11. Show Ingress Controller resources
@@ -255,7 +236,6 @@ kubectl get svc -n ingress-nginx
 
 echo
 
-
 # ------------------------------------------------------------
 # 12. Wait for admission webhook endpoint
 # ------------------------------------------------------------
@@ -270,6 +250,8 @@ WEBHOOK_SERVICE="ingress-nginx-controller-admission"
 
 echo "Waiting for admission webhook endpoint..."
 
+WEBHOOK_ENDPOINTS=""
+
 for i in {1..60}; do
 
     WEBHOOK_ENDPOINTS=$(kubectl get endpoints \
@@ -279,55 +261,40 @@ for i in {1..60}; do
         2>/dev/null || true)
 
     if [ -n "$WEBHOOK_ENDPOINTS" ]; then
+
         echo
         echo "Admission webhook is ready."
         echo "Endpoint: $WEBHOOK_ENDPOINTS"
+
         break
     fi
 
     echo "Waiting for admission webhook... ($i/60)"
+
     sleep 2
 
 done
 
 if [ -z "$WEBHOOK_ENDPOINTS" ]; then
+
     echo
     echo "ERROR: Admission webhook did not become ready."
     echo
+
     echo "Run:"
     echo "  kubectl get pods -n ingress-nginx"
     echo "  kubectl get svc -n ingress-nginx"
     echo "  kubectl get endpoints -n ingress-nginx"
+
     echo
+
     exit 1
 fi
 
 echo
 
-
 # ------------------------------------------------------------
 # 13. Generate country-specific Ingress
-# ------------------------------------------------------------
-#
-# ingress.yaml contains:
-#
-#   host: __COUNTRY__.local
-#
-# For:
-#
-#   ./fresh-install.sh india
-#
-# it becomes:
-#
-#   host: india.local
-#
-# For:
-#
-#   ./fresh-install.sh japan
-#
-# it becomes:
-#
-#   host: japan.local
 # ------------------------------------------------------------
 
 echo "============================================================"
@@ -345,12 +312,10 @@ echo "Generated Ingress file:"
 echo "  $GENERATED_INGRESS"
 
 echo
-
 echo "Ingress Host:"
 echo "  $HOST"
 
 echo
-
 
 # ------------------------------------------------------------
 # 14. Apply Ingress
@@ -361,7 +326,6 @@ echo "Applying country-specific Ingress..."
 kubectl apply -f "$GENERATED_INGRESS"
 
 echo
-
 
 # ------------------------------------------------------------
 # 15. Verify Ingress
@@ -377,18 +341,25 @@ kubectl get ingress -n "$NAMESPACE"
 
 echo
 
-
 # ------------------------------------------------------------
 # 16. Get Minikube IP
 # ------------------------------------------------------------
 
 MINIKUBE_IP=$(minikube ip)
 
+if [ -z "$MINIKUBE_IP" ]; then
+
+    echo
+    echo "ERROR: Could not determine Minikube IP."
+    echo
+
+    exit 1
+fi
+
 echo "Minikube IP:"
 echo "  $MINIKUBE_IP"
 
 echo
-
 
 # ------------------------------------------------------------
 # 17. Get dynamic Ingress NodePort
@@ -415,7 +386,6 @@ echo "  $INGRESS_PORT"
 
 echo
 
-
 # ------------------------------------------------------------
 # 18. Display URLs
 # ------------------------------------------------------------
@@ -436,23 +406,42 @@ echo
 
 echo "API URLs:"
 echo
-echo "  http://${MINIKUBE_IP}:${INGRESS_PORT}/hello"
-echo "  http://${MINIKUBE_IP}:${INGRESS_PORT}/hello-health"
-echo "  http://${MINIKUBE_IP}:${INGRESS_PORT}/bye"
-echo "  http://${MINIKUBE_IP}:${INGRESS_PORT}/bye-health"
+
+echo "  ${BASE_URL}/hello"
+echo "  ${BASE_URL}/hello-health"
+echo "  ${BASE_URL}/bye"
+echo "  ${BASE_URL}/bye-health"
+
 echo
 
-echo "Host-based URLs:"
+echo "Browser URLs:"
 echo
+
+echo "  http://${HOST}:${INGRESS_PORT}/hello"
+echo "  http://${HOST}:${INGRESS_PORT}/hello-health"
+echo "  http://${HOST}:${INGRESS_PORT}/bye"
+echo "  http://${HOST}:${INGRESS_PORT}/bye-health"
+
+echo
+
+echo "NOTE:"
+echo "  Add the following entry to /etc/hosts:"
+echo
+echo "  ${MINIKUBE_IP}    ${HOST}"
+echo
+
+echo "Future clean URLs after port 80 configuration:"
+echo
+
 echo "  http://${HOST}/hello"
 echo "  http://${HOST}/hello-health"
 echo "  http://${HOST}/bye"
 echo "  http://${HOST}/bye-health"
+
 echo
 
 echo "============================================================"
 echo
-
 
 # ------------------------------------------------------------
 # 19. Test API
@@ -463,11 +452,11 @@ echo "             TESTING API"
 echo "============================================================"
 
 echo
+echo "sleep for 30 seconds, letting everything up and running"
 sleep 30
 ./test-api.sh "$CONTEXT"
 
 echo
-
 
 # ------------------------------------------------------------
 # 20. Final resource status
@@ -514,21 +503,21 @@ kubectl get ingress -n "$NAMESPACE"
 
 echo
 
-
 # ------------------------------------------------------------
 # 21. Other cluster information
 # ------------------------------------------------------------
 
 echo "Ingress Controller:"
+
 kubectl get pods -n ingress-nginx
 
 echo
 
 echo "All namespaces:"
+
 kubectl get pods -A
 
 echo
-
 
 # ------------------------------------------------------------
 # 22. Useful commands
@@ -560,12 +549,24 @@ echo "  kubectl get ingress -n $NAMESPACE"
 
 echo
 
+echo "Browser URL:"
+echo "  http://${HOST}:${INGRESS_PORT}/hello"
+
+echo
+
 echo "============================================================"
 echo "             INSTALL COMPLETE"
 echo "============================================================"
+
 echo
+
 echo "Context    : $CONTEXT"
 echo "Namespace  : $NAMESPACE"
 echo "Host       : $HOST"
+echo "Ingress    : ${MINIKUBE_IP}:${INGRESS_PORT}"
+echo "Browser    : http://${HOST}:${INGRESS_PORT}/hello"
+
+echo
+
 echo "============================================================"
 echo

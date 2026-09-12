@@ -6,6 +6,8 @@
 # Usage:
 #   ./test-api.sh india
 #   ./test-api.sh japan
+#   ./test-api.sh america
+#   ./test-api.sh greece
 #   ./test-api.sh canada
 #   ./test-api.sh australia
 #
@@ -17,6 +19,12 @@
 #
 # Ingress Host:
 #   india.local
+#
+# Current URL:
+#   http://india.local:<INGRESS_PORT>/hello
+#
+# The Host header is used by NGINX Ingress to select
+# the correct country namespace/application.
 # ============================================================
 
 set -e
@@ -26,12 +34,16 @@ set -e
 # ------------------------------------------------------------
 
 if [ -z "$1" ]; then
+
     echo
     echo "ERROR: Country/context is required."
     echo
+
     echo "Usage:"
     echo "  $0 <country>"
+
     echo
+
     echo "Examples:"
     echo "  $0 india"
     echo "  $0 japan"
@@ -39,7 +51,9 @@ if [ -z "$1" ]; then
     echo "  $0 greece"
     echo "  $0 canada"
     echo "  $0 australia"
+
     echo
+
     exit 1
 fi
 
@@ -52,12 +66,16 @@ HOST="${CONTEXT}.local"
 # ------------------------------------------------------------
 
 if ! kubectl get namespace "$NAMESPACE" >/dev/null 2>&1; then
+
     echo
     echo "ERROR: Namespace '$NAMESPACE' does not exist."
     echo
+
     echo "Available namespaces:"
     kubectl get namespaces
+
     echo
+
     exit 1
 fi
 
@@ -66,12 +84,16 @@ fi
 # ------------------------------------------------------------
 
 if ! kubectl config get-contexts "$CONTEXT" >/dev/null 2>&1; then
+
     echo
     echo "ERROR: Kubernetes context '$CONTEXT' does not exist."
     echo
+
     echo "Available contexts:"
     kubectl config get-contexts
+
     echo
+
     exit 1
 fi
 
@@ -88,9 +110,11 @@ kubectl config use-context "$CONTEXT" >/dev/null
 MINIKUBE_IP=$(minikube ip)
 
 if [ -z "$MINIKUBE_IP" ]; then
+
     echo
     echo "ERROR: Could not determine Minikube IP."
     echo
+
     exit 1
 fi
 
@@ -103,12 +127,17 @@ INGRESS_PORT=$(kubectl get svc ingress-nginx-controller \
     -o jsonpath='{.spec.ports[?(@.port==80)].nodePort}')
 
 if [ -z "$INGRESS_PORT" ]; then
+
     echo
     echo "ERROR: Could not determine Ingress HTTP NodePort."
     echo
+
     echo "Ingress service:"
-    kubectl get svc ingress-nginx-controller -n ingress-nginx
+    kubectl get svc ingress-nginx-controller \
+        -n ingress-nginx
+
     echo
+
     exit 1
 fi
 
@@ -118,15 +147,20 @@ fi
 
 INGRESS_NAME=$(kubectl get ingress \
     -n "$NAMESPACE" \
-    -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+    -o jsonpath='{.items[0].metadata.name}' \
+    2>/dev/null || true)
 
 if [ -z "$INGRESS_NAME" ]; then
+
     echo
     echo "ERROR: No Ingress found in namespace '$NAMESPACE'."
     echo
+
     echo "Run:"
     echo "  kubectl get ingress -n $NAMESPACE"
+
     echo
+
     exit 1
 fi
 
@@ -144,7 +178,9 @@ echo
 echo "============================================================"
 echo "                  HELLO-BYE API TEST"
 echo "============================================================"
+
 echo
+
 echo "Country/Context : $CONTEXT"
 echo "Namespace       : $NAMESPACE"
 echo "Ingress         : $INGRESS_NAME"
@@ -152,19 +188,21 @@ echo "Host            : $HOST"
 echo "Minikube IP     : $MINIKUBE_IP"
 echo "Ingress Port    : $INGRESS_PORT"
 echo "Base URL        : $BASE_URL"
+
 echo
+
 echo "============================================================"
 echo
 
 # ------------------------------------------------------------
-# Function to test endpoint
+# 10. Function to test endpoint
 # ------------------------------------------------------------
 
 test_endpoint() {
 
     ENDPOINT="$1"
 
-    echo "Testing $ENDPOINT"
+    echo "Testing: ${ENDPOINT}"
     echo "------------------------------------------------------------"
 
     RESPONSE=$(curl -s \
@@ -175,23 +213,30 @@ test_endpoint() {
     HTTP_STATUS=$(echo "$RESPONSE" | sed -n 's/HTTP_STATUS://p')
     BODY=$(echo "$RESPONSE" | sed '/HTTP_STATUS:/d')
 
+    echo
     echo "HTTP Status : $HTTP_STATUS"
+
+    echo
     echo "Response:"
     echo "$BODY"
 
     echo
 
     if [ "$HTTP_STATUS" = "200" ]; then
+
         echo "RESULT      : PASS"
+
     else
+
         echo "RESULT      : FAIL"
+
     fi
 
     echo
 }
 
 # ------------------------------------------------------------
-# 10. Run API tests
+# 11. Run API tests
 # ------------------------------------------------------------
 
 test_endpoint "/hello-health"
@@ -203,22 +248,34 @@ test_endpoint "/hello"
 test_endpoint "/bye"
 
 # ------------------------------------------------------------
-# 11. Final status
+# 12. Final status
 # ------------------------------------------------------------
 
 echo "============================================================"
 echo "                    TEST COMPLETE"
 echo "============================================================"
+
 echo
+
 echo "Country    : $CONTEXT"
 echo "Namespace  : $NAMESPACE"
 echo "Host       : $HOST"
+echo "Ingress    : ${MINIKUBE_IP}:${INGRESS_PORT}"
+
 echo
+
 echo "Tested:"
 echo "  /hello-health"
 echo "  /bye-health"
 echo "  /hello"
 echo "  /bye"
+
 echo
+
+echo "Browser:"
+echo "  http://${HOST}:${INGRESS_PORT}/hello"
+
+echo
+
 echo "============================================================"
 echo
