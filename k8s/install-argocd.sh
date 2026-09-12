@@ -15,9 +15,9 @@ kubectl delete crd appprojects.argoproj.io
 kubectl delete namespace argocd
 kubectl create namespace argocd
 kubectl get namespace argocd
-docker pull quay.io/argoproj/argocd:v3.5.2
-minikube image load quay.io/argoproj/argocd:v3.5.2
-kubectl create namespace argocd
+#docker pull quay.io/argoproj/argocd:v3.5.2
+#minikube image load quay.io/argoproj/argocd:v3.5.2
+#kubectl create namespace argocd
 kubectl apply -n argocd --server-side --force-conflicts -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 kubectl get pods -n argocd -w
 echo "wait for 30sec for argocd installation"
@@ -25,7 +25,7 @@ sleep 30
 kubectl get pods -n argocd
 kubectl get svc -n argocd
 # port forwarding
-kubectl port-forward svc/argocd-server -n argocd 8080:443 &
+kubectl port-forward svc/argocd-server -n argocd 8081:443 &
 # Argo CD UI
 echo "https://localhost:8080/"
 # argo cd password:

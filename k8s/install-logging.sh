@@ -76,4 +76,4 @@ echo "make sure 3100 and 3000 port are forwarded and open localhost:3000"
 echo "by running below commands - "
 echo "kubectl port-forward -n loki svc/loki 3100:3100 &"
 
-echo "Then check: curl -s "http://localhost:3100/loki/api/v1/labels"
+echo "Then check: curl -s http://localhost:3100/loki/api/v1/labels"
