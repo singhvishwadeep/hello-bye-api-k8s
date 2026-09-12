@@ -1,4 +1,13 @@
-CONTEXT="${1:demo-context}"
+#!/bin/bash
+if [ -z "$1" ]; then
+    echo "ERROR: Context/namespace is required."
+    echo "Usage: $0 <context>"
+    exit 1
+fi
+
+CONTEXT="$1"
+
+echo "Using context: $CONTEXT-hello-bye"
 minikube start --driver=docker
 kubectl create namespace $CONTEXT-hello-bye
 kubectl config set-context $CONTEXT --cluster=minikube --user=minikube --namespace=$CONTEXT-hello-bye
