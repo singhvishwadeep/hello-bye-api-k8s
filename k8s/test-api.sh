@@ -1,4 +1,84 @@
-curl localhost:5000/hello
-curl localhost:5000/health
-curl localhost:6000/bye
-curl localhost:6000/health
+#!/bin/bash
+
+# --------------------------------------------------
+# Get Minikube IP
+# --------------------------------------------------
+
+MINIKUBE_IP=$(minikube ip)
+
+# --------------------------------------------------
+# Get Ingress HTTP NodePort
+# --------------------------------------------------
+
+INGRESS_PORT=$(kubectl get svc ingress-nginx-controller \
+  -n ingress-nginx \
+  -o jsonpath='{.spec.ports[?(@.port==80)].nodePort}')
+
+# --------------------------------------------------
+# Build Ingress URL
+# --------------------------------------------------
+
+BASE_URL="http://${MINIKUBE_IP}:${INGRESS_PORT}"
+
+# --------------------------------------------------
+# Display configuration
+# --------------------------------------------------
+
+echo
+echo "========================================"
+echo "          HELLO-BYE API TEST"
+echo "========================================"
+echo "Minikube IP  : ${MINIKUBE_IP}"
+echo "Ingress Port : ${INGRESS_PORT}"
+echo "Base URL     : ${BASE_URL}"
+echo "========================================"
+echo
+
+# --------------------------------------------------
+# Hello Health API
+# --------------------------------------------------
+
+echo "Testing /hello-health"
+echo "----------------------------------------"
+curl -s "${BASE_URL}/hello-health"
+echo
+echo
+
+# --------------------------------------------------
+# Bye Health API
+# --------------------------------------------------
+
+echo "Testing /bye-health"
+echo "----------------------------------------"
+curl -s "${BASE_URL}/bye-health"
+echo
+echo
+
+# --------------------------------------------------
+# Hello API
+# --------------------------------------------------
+
+echo "Testing /hello"
+echo "----------------------------------------"
+curl -s "${BASE_URL}/hello"
+echo
+echo
+
+# --------------------------------------------------
+# Bye API
+# --------------------------------------------------
+
+echo "Testing /bye"
+echo "----------------------------------------"
+curl -s "${BASE_URL}/bye"
+echo
+echo
+
+# --------------------------------------------------
+# Test complete
+# --------------------------------------------------
+
+echo "========================================"
+echo "             TEST COMPLETE"
+echo "========================================"
+echo
